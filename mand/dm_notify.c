@@ -61,9 +61,6 @@ static void reset_notify_element(const struct dm_table *kw, struct dm_value_tabl
 {
 	const struct dm_element *elem;
 
-	if (!kw->table)
-		return;
-
 	elem = &kw->table[index];
 
 	switch(elem->type) {
@@ -312,9 +309,6 @@ static void set_notify_slot_object(const struct dm_element *elem, struct dm_inst
 static void set_notify_slot_element(const struct dm_table *kw, struct dm_value_table *st, int index, int slot, uint32_t ntfy)
 {
 	const struct dm_element *elem;
-
-	if (!kw->table)
-		return;
 
 	elem = &kw->table[index];
 

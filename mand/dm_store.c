@@ -1357,9 +1357,6 @@ static int update_flags_element(const struct dm_table *kw, struct dm_value_table
 
 	const struct dm_element *elem;
 
-	if (!kw->table)
-		return 0;
-
 	elem = &kw->table[index];
 	ret = st->values[index].flags & (DV_UPDATED | DV_NOTIFY);
 
