@@ -51,6 +51,11 @@ struct XMLstate {
 	DM_VALUE *value;
 	int flags;
 	char *text;
+	/** state of string_unescape() */
+	struct {
+		int in_c;
+		char c;
+	} unescape;
 	struct dm_instance *inst;
 	struct dm_instance_node *node;
 };
@@ -185,29 +190,27 @@ startElement(void *userData, const char *name, const char **atts)
 	}
 }
 
-static void string_unescape(char *text, const char *s, int len)
+static void string_unescape(struct XMLstate *state, const char *s, int len)
 {
-	int in_c = 0;
-	char c = 0;
-	char *d = text + strlen(text);
+	char *d = state->text + strlen(state->text);
 
 	while (len) {
-		if (!in_c) {
+		if (!state->unescape.in_c) {
 			if (*s == '\\') {
-				in_c++;
-				c = '\0';
+				state->unescape.in_c++;
+				state->unescape.c = '\0';
 			} else
 				*d++ = *s;
 		} else {
 			if (*s >= '0' && *s <= '7') {
-				c = (c << 3) | (*s - '0');
-				in_c++;
+				state->unescape.c = (state->unescape.c << 3) | (*s - '0');
+				state->unescape.in_c++;
 			} else
 				/* abort decoding on error */
 				break;
-			if (in_c == 4) {
-				*d++ = c;
-				in_c = 0;
+			if (state->unescape.in_c == 4) {
+				*d++ = state->unescape.c;
+				state->unescape.in_c = 0;
 			}
 		}
 		s++;
@@ -230,7 +233,7 @@ charElement(void *userData, const XML_Char *s, int len)
 		return;
 
 	if (((*state)->flags & XML_ESCAPED) == XML_ESCAPED)
-		string_unescape((*state)->text, s, len);
+		string_unescape(*state, s, len);
 	else
 		strncat((*state)->text, s, len);
 }
