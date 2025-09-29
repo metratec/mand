@@ -2035,7 +2035,7 @@ static uint32_t update_interface_state(struct dm_value_table *tbl)
 		return rc;
 	}
 	uint8_t mac[6];
-	memcpy(mac, &ifr.ifr_hwaddr, sizeof(mac));
+	memcpy(mac, ifr.ifr_hwaddr.sa_data, sizeof(mac));
 
 	struct ethtool_cmd cmd;
 	ifr.ifr_data = (void *)&cmd;
